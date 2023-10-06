@@ -36,3 +36,8 @@ Repositório para o Projeto Integrador a ser realizado para a matéria de Desenv
 
 
 ## Diagramas
+###Diagrama de casos de uso
+![Diagrama Casos de Uso](https://github.com/ArthurMitsuo/ProjetoIntegrador/assets/77021980/c7f33ba9-b2cd-46b8-8c96-2fa673a0c584)
+
+###Diagrama de Classes
+![Diagrama de classe](https://github.com/ArthurMitsuo/ProjetoIntegrador/assets/77021980/c951e1d9-ba8e-43fa-9222-b1541c5e5797)
