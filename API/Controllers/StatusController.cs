@@ -1,6 +1,6 @@
 ﻿namespace API;
 
-public class Status
+public class StatusController
 {
 
 }
