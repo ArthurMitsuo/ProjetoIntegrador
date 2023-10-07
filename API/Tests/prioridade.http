@@ -1,0 +1,11 @@
+### Listar Prioridades ###
+GET https://localhost:7134/api/prioridade/listar
+
+### Criar Prioridade ###
+POST https://localhost:7134/api/prioridade/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade não é urgente"
+}

@@ -11,9 +11,27 @@ public class AppDataContext : DbContext
     }
 
     //Classes que vão se tornar tabelas no banco de dados
-    //public DbSet<Produto> Produtos { get; set; }
     public DbSet<Cargo> Cargos {get; set;}
     public DbSet<Grupo> Grupos {get; set;}
     public DbSet<Prioridade> Prioridades {get; set;}
     public DbSet<Status> Status {get; set;}
+    public DbSet<Tarefa> Tarefas {get; set;}
+    public DbSet<Usuario> Usuarios {get; set;}
+
+    //Mapeamento da herança das classes Tarefa e Usuario com TUTTH, mapeando e criando novo campo com o valor
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Tarefa>()
+            .HasDiscriminator<string>("Tipo")
+            .HasValue<TarefaAtividade>("Atividade")
+            .HasValue<TarefaProjeto>("Projeto");
+
+        modelBuilder.Entity<Usuario>()
+            .HasDiscriminator<string>("Tipo")
+            .HasValue<UsuarioAdmin>("Admin")
+            .HasValue<UsuarioGerencial>("Gerencial")
+            .HasValue<UsuarioOperacional>("Operacional");    
+
+        base.OnModelCreating(modelBuilder);
+    }
 }

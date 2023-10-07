@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Usuarios\" />
     <Folder Include="Tests\" />
   </ItemGroup>
 
