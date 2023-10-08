@@ -12,7 +12,7 @@ public class CargoController : ControllerBase
         _context=context;
     }
 
-    // GET: api/categoria/listar
+    // GET: api/cargo/listar
     [HttpGet]
     [Route("listar")]
     public IActionResult Listar(){
@@ -27,7 +27,7 @@ public class CargoController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: exclusivo para usuário admin
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Cargo cargo)

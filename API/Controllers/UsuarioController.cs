@@ -24,7 +24,7 @@ public class UsuarioController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: Exclusivo para usuário Admin
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Usuario usuario)
@@ -78,6 +78,7 @@ public class UsuarioController : ControllerBase
                 usuarioCadastro.Nome = usuario.Nome;
                 usuarioCadastro.Login = usuario.Login;
                 usuarioCadastro.Senha = usuario.Senha;
+                usuarioCadastro.Tipo = usuario.Tipo;
                 usuarioCadastro.DataNascimento = usuario.DataNascimento;
                 _context.SaveChanges();
                 return Ok();

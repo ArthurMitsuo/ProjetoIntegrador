@@ -25,7 +25,7 @@ public class TarefaController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: para todos os usuários
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Tarefa tarefa)
