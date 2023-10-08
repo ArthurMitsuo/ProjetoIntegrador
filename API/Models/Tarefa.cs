@@ -12,4 +12,5 @@ public class Tarefa
     public string? Corpo { get; set; }
     public Prioridade? Prioridade { get; set; }
     public DateTime CriadoEm { get; set; }
+    public int UsuarioId { get; internal set; }
 }

@@ -88,4 +88,30 @@ public class UsuarioController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-}
+    //Metodo Listar Tarefa de usuarios
+    [HttpGet("tarefas/ListarTarefas")]
+        public IActionResult ListarTarefasDoUsuario(int id)
+        {
+            try
+            {
+                // Primeiro, verifique se o usuário existe
+                var usuario = _context.Usuarios.FirstOrDefault(u => u.UsuarioId == id);
+
+                if (usuario == null)
+                {
+                    return NotFound("Usuário não encontrado");
+                }
+
+                // Em seguida, recupere as tarefas do usuário com base no seu ID
+                var tarefasDoUsuario = _context.Tarefas
+                    .Where(t => t.UsuarioId == id)
+                    .ToList();
+
+                return Ok(tarefasDoUsuario);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+    }
