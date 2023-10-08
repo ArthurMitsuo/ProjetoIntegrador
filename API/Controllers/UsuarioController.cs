@@ -2,6 +2,7 @@
 using API.Data;
 namespace API;
 
+/*TESTE PARA COMMIT*/
 public class UsuarioController : ControllerBase
 {
     private readonly AppDataContext _context;
