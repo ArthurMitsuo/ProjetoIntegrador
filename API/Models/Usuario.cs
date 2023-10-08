@@ -9,6 +9,7 @@ public class Usuario
     public string? Login { get; set; }
     public string? Senha { get; set; }
     public string? DataNascimento { get; set; }
+    public bool? Logado { get; set; }
     public List<Tarefa>? Tarefas { get; set; }
     public DateTime DataCadastro { get; set; }
 }

@@ -4,7 +4,7 @@ using API.Data;
 
 [ApiController]
 [Route("api/tarefa")]
-public class TarefaController : ControllerBase
+public class TarefaController : ControllerBase, ManipulacaoTarefa
 {
     private readonly AppDataContext _context;
     public TarefaController(AppDataContext context){
