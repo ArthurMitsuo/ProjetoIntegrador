@@ -9,6 +9,7 @@ public class Tarefa
     public Status? Status { get; set; }
     public Usuario? Usuario { get; set; }
     public string? Descricao { get; set; }
+    public List<string>? Comentarios { get; set; }
     public string? Corpo { get; set; }
     public Prioridade? Prioridade { get; set; }
     public DateTime CriadoEm { get; set; }

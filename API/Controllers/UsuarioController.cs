@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 
-public class UsuarioController : ControllerBase,ManipulacaoTarefa
+public class UsuarioController : ControllerBase
 {
     private readonly AppDataContext _context;
     public UsuarioController(AppDataContext context){
@@ -102,23 +102,23 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
         }
     }
 
-    //Metodo Listar Tarefa de usuarios
+    //Metodo Listar Tarefa de usuario, chamando pelo ID
     [HttpGet]
     [Route("listarTarefasUsuario/{id}")]
-    public IActionResult ListarTarefasDoUsuario(int id)
+    public IActionResult ListarTarefasDoUsuario([FromRoute]int id, [FromBody] Usuario usuario)
     {
         try
         {
             // Primeiro, verifique se o usuário existe
-            var usuario = _context.Usuarios.FirstOrDefault(u => u.UsuarioId == id);
+             Usuario? usuarioCadastro = _context.Usuarios.FirstOrDefault(x => x.UsuarioId == id);
 
-            if (usuario == null)
+            if (usuarioCadastro == null)
             {
                 return NotFound("Usuário não encontrado");
             }
 
-            // Em seguida, recupere as tarefas do usuário com base no seu ID
-            var tarefasDoUsuario = usuario.Tarefas;                  
+            // Em seguida, recupere as tarefas do usuário
+            var tarefasDoUsuario = usuario.Tarefas;
 
             return Ok(tarefasDoUsuario);
         }
@@ -127,51 +127,58 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
             return BadRequest(e.Message);
         }
     }
-    
+
+    //----
+    //Metodo Listar Todas as Tarefas - Usuários Admin e Gerencial; Buscar do Route das Tarefas - GET
+    //Metodo Criar Novas Tarefas - Todos os Usuários; Buscar do Route das Tarefas - POST
+    //Metodo Alterar Tarefas - Todos os Usuarios; Buscar do Route das Tarefas - PUT
+    //Metodo Deletar - Apenas o Admin; Buscar do Route das Tarefas - DELETE
+    //Método de adicionar comentário em tarefa - Apenas Gerencial e Admin; Buscar do Route das Tarefas - PUT
+    //----
 
 
-        //------Sessão para criptografia de senha de usuário--------
-        // Gera um salt aleatório
-        public static byte[] GenerateSalt()
-        {   
-            byte[] salt = new byte[16];
-            RandomNumberGenerator.Fill(salt);
-            return salt;
+    //------Sessão para criptografia de senha de usuário--------
+    // Gera um salt aleatório
+    public static byte[] GenerateSalt()
+    {   
+        byte[] salt = new byte[16];
+        RandomNumberGenerator.Fill(salt);
+        return salt;
+    }
+
+    // Gera o hash da senha usando o salt
+    public static string HashPassword(string? senha, byte[] salt)
+    {
+        if (senha == null)
+        {
+            throw new ArgumentNullException(nameof(senha), "A senha não pode ser nula.");
         }
 
-        // Gera o hash da senha usando o salt
-        public static string HashPassword(string? senha, byte[] salt)
+        using (var sha256 = SHA256.Create())
         {
-            if (senha == null)
+            byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
+            byte[] senhaComSalt = new byte[senhaBytes.Length + salt.Length];
+
+            for (int i = 0; i < senhaBytes.Length; i++)
             {
-                throw new ArgumentNullException(nameof(senha), "A senha não pode ser nula.");
+                senhaComSalt[i] = senhaBytes[i];
+            }
+            for (int i = 0; i < salt.Length; i++)
+            {
+                senhaComSalt[senhaBytes.Length + i] = salt[i];
             }
 
-            using (var sha256 = SHA256.Create())
-            {
-                byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
-                byte[] senhaComSalt = new byte[senhaBytes.Length + salt.Length];
-
-                for (int i = 0; i < senhaBytes.Length; i++)
-                {
-                    senhaComSalt[i] = senhaBytes[i];
-                }
-                for (int i = 0; i < salt.Length; i++)
-                {
-                    senhaComSalt[senhaBytes.Length + i] = salt[i];
-                }
-
-                byte[] hashedPassword = sha256.ComputeHash(senhaComSalt);
-                return Convert.ToBase64String(hashedPassword);
-            }
+            byte[] hashedPassword = sha256.ComputeHash(senhaComSalt);
+            return Convert.ToBase64String(hashedPassword);
         }
+    }
 
-        // Verifica se uma senha fornecida corresponde ao hash armazenado
-        public static bool VerifyPassword(string senha, byte[] salt, string hash)
-        {
-            string senhaHashed = HashPassword(senha, salt);
-            return senhaHashed == hash;
-        }
-    
+    // Verifica se uma senha fornecida corresponde ao hash armazenado
+    public static bool VerifyPassword(string senha, byte[] salt, string hash)
+    {
+        string senhaHashed = HashPassword(senha, salt);
+        return senhaHashed == hash;
+    }
+    //-------------------------FIM---------------------------
 }
 
