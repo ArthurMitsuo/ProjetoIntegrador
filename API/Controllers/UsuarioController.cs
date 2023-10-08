@@ -13,7 +13,7 @@ public class UsuarioController : ControllerBase
         _context = context;
     }
 
-    //listam todos os usuários
+    //GET - listam todos os usuários
     [HttpGet]
     [Route("listar")]
     public IActionResult Listar(){
@@ -28,10 +28,106 @@ public class UsuarioController : ControllerBase
         }
     }
 
+    //listam todos os usuários OPERACIONAIS
+    [HttpGet]
+    [Route("operacional/listar")]
+    public IActionResult ListarOperacional(){
+        try
+        {
+            List<UsuarioOperacional> usuario = _context.UsuariosOperacionais.ToList();
+            return Ok(usuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //listam todos os usuários GERENCIAIS
+    [HttpGet]
+    [Route("gerencial/listar")]
+    public IActionResult ListarGerencial(){
+        try
+        {
+            List<UsuarioGerencial> usuario = _context.UsuariosGerenciais.ToList();
+            return Ok(usuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //listam todos os usuários ADMIN
+    [HttpGet]
+    [Route("admin/listar")]
+    public IActionResult ListarAdmin(){
+        try
+        {
+            List<UsuarioAdmin> usuario = _context.UsuariosAdmin.ToList();
+            return Ok(usuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     // POST: Exclusivo para usuário Admin
+    //Cadastrar Operacional
     [HttpPost]
-    [Route("cadastrar")]
-    public IActionResult Cadastrar([FromBody] Usuario usuario)
+    [Route("operacional/cadastrar")]
+    public IActionResult CadastrarOperacional([FromBody] UsuarioOperacional usuario)
+    {
+        try
+        {
+            string? usuarioSenha = usuario.Senha;
+
+            // Gerar um salt aleatório (um valor único para cada usuário)
+            byte[] salt = GenerateSalt();
+
+            // Gerar o hash da senha com o salt
+            string senhaHashed = HashPassword(usuarioSenha, salt);
+
+            usuario.Senha = senhaHashed;
+
+            _context.Add(usuario);
+            _context.SaveChanges();
+            return Created("", usuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Cadastrar Gerencial
+    [HttpPost]
+    [Route("gerencial/cadastrar")]
+    public IActionResult CadastrarGerencial([FromBody] UsuarioGerencial usuario)
+    {
+        try
+        {
+            string? usuarioSenha = usuario.Senha;
+
+            // Gerar um salt aleatório (um valor único para cada usuário)
+            byte[] salt = GenerateSalt();
+
+            // Gerar o hash da senha com o salt
+            string senhaHashed = HashPassword(usuarioSenha, salt);
+
+            usuario.Senha = senhaHashed;
+
+            _context.Add(usuario);
+            _context.SaveChanges();
+            return Created("", usuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Cadastrar Admin
+    [HttpPost]
+    [Route("admin/cadastrar")]
+    public IActionResult CadastrarAdmin([FromBody] UsuarioAdmin usuario)
     {
         try
         {
@@ -55,13 +151,57 @@ public class UsuarioController : ControllerBase
         }
     }
 
+    //DELETE - apenas Admin
+    //Operacional
     [HttpDelete]
-    [Route("deletar/{id}")]
+    [Route("operacional/deletar/{id}")]
+    public IActionResult DeletarOperacional([FromRoute] int id)
+    {
+        try
+        {
+            UsuarioOperacional? usuarioCadastro = _context.UsuariosOperacionais.Find(id);
+            if (usuarioCadastro != null)
+            {
+                _context.Usuarios.Remove(usuarioCadastro);
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Gerencial
+    [HttpDelete]
+    [Route("gerencial/deletar/{id}")]
+    public IActionResult DeletarGerencial([FromRoute] int id)
+    {
+        try
+        {
+            UsuarioGerencial? usuarioCadastro = _context.UsuariosGerenciais.Find(id);
+            if (usuarioCadastro != null)
+            {
+                _context.Usuarios.Remove(usuarioCadastro);
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Admin
+    [HttpDelete]
+    [Route("admin/deletar/{id}")]
     public IActionResult Deletar([FromRoute] int id)
     {
         try
         {
-            Usuario? usuarioCadastro = _context.Usuarios.Find(id);
+            UsuarioAdmin? usuarioCadastro = _context.UsuariosAdmin.Find(id);
             if (usuarioCadastro != null)
             {
                 _context.Usuarios.Remove(usuarioCadastro);
@@ -76,16 +216,74 @@ public class UsuarioController : ControllerBase
         }
     }
 
+    //PUT - para o próprio usuário, apenas ele; Para admin, todos
+    //Operacional
     [HttpPut]
-    [Route("alterar/{id}")]
-    public IActionResult Alterar([FromRoute] int id,
+    [Route("operacional/alterar/{id}")]
+    public IActionResult AlterarOperacional([FromRoute] int id,
         [FromBody] Usuario usuario)
     {
         try
         {
             //Expressões lambda
-            Usuario? usuarioCadastro =
-                _context.Usuarios.FirstOrDefault(x => x.UsuarioId == id);
+            UsuarioOperacional? usuarioCadastro =
+                _context.UsuariosOperacionais.FirstOrDefault(x => x.UsuarioId == id);
+
+            if (usuarioCadastro != null)
+            {
+                usuarioCadastro.Nome = usuario.Nome;
+                usuarioCadastro.Login = usuario.Login;
+                usuarioCadastro.Senha = usuario.Senha;
+                usuarioCadastro.DataNascimento = usuario.DataNascimento;
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Gerencial
+    [HttpPut]
+    [Route("gerencial/alterar/{id}")]
+    public IActionResult AlterarGerencial([FromRoute] int id,
+        [FromBody] Usuario usuario)
+    {
+        try
+        {
+            //Expressões lambda
+            UsuarioGerencial? usuarioCadastro =
+                _context.UsuariosGerenciais.FirstOrDefault(x => x.UsuarioId == id);
+
+            if (usuarioCadastro != null)
+            {
+                usuarioCadastro.Nome = usuario.Nome;
+                usuarioCadastro.Login = usuario.Login;
+                usuarioCadastro.Senha = usuario.Senha;
+                usuarioCadastro.DataNascimento = usuario.DataNascimento;
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Admin
+    [HttpPut]
+    [Route("admin/alterar/{id}")]
+    public IActionResult AlterarAdmin([FromRoute] int id,
+        [FromBody] Usuario usuario)
+    {
+        try
+        {
+            //Expressões lambda
+            UsuarioAdmin? usuarioCadastro =
+                _context.UsuariosAdmin.FirstOrDefault(x => x.UsuarioId == id);
 
             if (usuarioCadastro != null)
             {
@@ -104,15 +302,41 @@ public class UsuarioController : ControllerBase
         }
     }
 
-    //Metodo Listar Tarefa de usuario, chamando pelo ID do Usuario
+
+    //Metodo Listar Tarefa de usuario Operacional, chamando pelo ID do Usuario
     [HttpGet]
-    [Route("listarTarefasUsuario/{id}")]
-    public IActionResult ListarTarefasDoUsuario([FromRoute]int id, [FromBody] Usuario usuario)
+    [Route("operacional/listar-tarefa/{id}")]
+    public IActionResult ListarTarefasDoUsuarioOperacional([FromRoute]int id, [FromBody] UsuarioOperacional usuario)
     {
         try
         {
             // Primeiro, verifique se o usuário existe
-             Usuario? usuarioCadastro = _context.Usuarios.FirstOrDefault(x => x.UsuarioId == id);
+             UsuarioOperacional? usuarioCadastro = _context.UsuariosOperacionais.FirstOrDefault(x => x.UsuarioId == id);
+
+            if (usuarioCadastro == null)
+            {
+                return NotFound("Usuário não encontrado");
+            }
+
+            // Em seguida, recupere as tarefas do usuário
+            var tarefasDoUsuario = usuario.Tarefas;
+
+            return Ok(tarefasDoUsuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Metodo Listar Tarefa de usuario Gerencial, chamando pelo ID do Usuario
+    [HttpGet]
+    [Route("gerencial/listar-tarefa/{id}")]
+    public IActionResult ListarTarefasDoUsuarioGerencial([FromRoute]int id, [FromBody] UsuarioGerencial usuario)
+    {
+        try
+        {
+            // Primeiro, verifique se o usuário existe
+             UsuarioGerencial? usuarioCadastro = _context.UsuariosGerenciais.FirstOrDefault(x => x.UsuarioId == id);
 
             if (usuarioCadastro == null)
             {

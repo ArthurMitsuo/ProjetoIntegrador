@@ -16,8 +16,8 @@ public class AppDataContext : DbContext
     public DbSet<Prioridade> Prioridades {get; set;}
     public DbSet<Status> Status {get; set;}
     public DbSet<Tarefa> Tarefas {get; set;}
-    public DbSet<TarefaAtividade> TarefaAtividade {get; set;}
-    public DbSet<TarefaProjeto> TarefaProjeto {get; set;}
+    public DbSet<TarefaAtividade> TarefasAtividade {get; set;}
+    public DbSet<TarefaProjeto> TarefasProjeto {get; set;}
     public DbSet<Usuario> Usuarios {get; set;}
     public DbSet<UsuarioOperacional> UsuariosOperacionais {get; set;}
     public DbSet<UsuarioGerencial> UsuariosGerenciais {get; set;}

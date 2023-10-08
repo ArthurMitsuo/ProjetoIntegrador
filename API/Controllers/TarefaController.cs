@@ -12,12 +12,27 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     }
     
     //GET - apenas os usuarios Gerencial e Admin
+    //Projeto
     [HttpGet]
-    [Route("listar")]
-    public IActionResult ListarTarefa(){
+    [Route("projeto/listar")]
+    public IActionResult ListarTarefaProjeto(){
         try
         {
-            List<Tarefa> tarefa = _context.Tarefas.ToList();
+            List<TarefaProjeto> tarefa = _context.TarefasProjeto.ToList();
+            return Ok(tarefa);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Atividade
+    [HttpGet]
+    [Route("atividade/listar")]
+    public IActionResult ListarTarefaAtividade(){
+        try
+        {
+            List<TarefaAtividade> tarefa = _context.TarefasAtividade.ToList();
             return Ok(tarefa);
         }
         catch (Exception e)
@@ -27,9 +42,26 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     }
 
     //POST: para todos os usuários
+    //Projeto
     [HttpPost]
-    [Route("cadastrar")]
-    public IActionResult CadastrarTarefa([FromBody] Tarefa tarefa)
+    [Route("projeto/cadastrar")]
+    public IActionResult CadastrarTarefaProjeto([FromBody] TarefaProjeto tarefa)
+    {
+        try
+        {
+            _context.Add(tarefa);
+            _context.SaveChanges();
+            return Created("", tarefa);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Atividade
+    [HttpPost]
+    [Route("atividade/cadastrar")]
+    public IActionResult CadastrarTarefaAtividade([FromBody] TarefaAtividade tarefa)
     {
         try
         {
@@ -43,17 +75,39 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
         }
     }
 
-    //DELETE - apenas para o Admin pode
+    //DELETE - apenas o Admin pode
+    //Projeto
     [HttpDelete]
-    [Route("deletar/{id}")]
-    public IActionResult DeletarTarefa([FromRoute] int id)
+    [Route("projeto/deletar/{id}")]
+    public IActionResult DeletarTarefaProjeto([FromRoute] int id)
     {
         try
         {
-            Tarefa? tarefaCadastro = _context.Tarefas.Find(id);
+            TarefaProjeto? tarefaCadastro = _context.TarefasProjeto.Find(id);
             if (tarefaCadastro != null)
             {
-                _context.Tarefas.Remove(tarefaCadastro);
+                _context.TarefasProjeto.Remove(tarefaCadastro);
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Atividade
+    [HttpDelete]
+    [Route("atividade/deletar/{id}")]
+    public IActionResult DeletarTarefaAtividade([FromRoute] int id)
+    {
+        try
+        {
+            TarefaAtividade? tarefaCadastro = _context.TarefasAtividade.Find(id);
+            if (tarefaCadastro != null)
+            {
+                _context.TarefasAtividade.Remove(tarefaCadastro);
                 _context.SaveChanges();
                 return Ok();
             }
@@ -66,16 +120,47 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     }
 
     //PUT - apenas o Admin pode
+    //Projeto
     [HttpPut]
-    [Route("alterar/{id}")]
-    public IActionResult AlterarTarefa([FromRoute] int id,
-        [FromBody] Tarefa tarefa)
+    [Route("projeto/alterar/{id}")]
+    public IActionResult AlterarTarefaProjeto([FromRoute] int id,
+        [FromBody] TarefaProjeto tarefa)
     {
         try
         {
             //Expressões lambda
-            Tarefa? tarefaCadastro =
-                _context.Tarefas.FirstOrDefault(x => x.TarefaId == id);
+            TarefaProjeto? tarefaCadastro =
+                _context.TarefasProjeto.FirstOrDefault(x => x.TarefaId == id);
+
+            if (tarefaCadastro != null)
+            {
+                tarefaCadastro.Nome = tarefa.Nome;
+                tarefaCadastro.Usuario = tarefa.Usuario;
+                tarefaCadastro.Descricao = tarefa.Descricao;
+                //Comentários são adicionados por usuários GERENCIAL e ADMIN
+                tarefaCadastro.Corpo = tarefa.Corpo;
+                tarefaCadastro.Prioridade = tarefa.Prioridade;
+                _context.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Atividade
+    [HttpPut]
+    [Route("atividade/alterar/{id}")]
+    public IActionResult AlterarTarefaAtividade([FromRoute] int id,
+        [FromBody] TarefaAtividade tarefa)
+    {
+        try
+        {
+            //Expressões lambda
+            TarefaAtividade? tarefaCadastro =
+                _context.TarefasAtividade.FirstOrDefault(x => x.TarefaId == id);
 
             if (tarefaCadastro != null)
             {

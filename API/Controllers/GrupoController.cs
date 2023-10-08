@@ -92,8 +92,8 @@ private readonly AppDataContext _context;
 
     //PUT - adicionar e retirar usuários Operadores
     [HttpPut]
-    [Route("adicionarUsuario/{idGrupo}/{idUsuario}")]
-    public IActionResult AdicionaUsuarioUsuario([FromRoute] int idGrupo, [FromRoute] int idUsuario)
+    [Route("adicionar-usuario-operacional/{idGrupo}/{idUsuario}")]
+    public IActionResult AdicionaUsuarioOperacional([FromRoute] int idGrupo, [FromRoute] int idUsuario)
     {
         try
         {
@@ -122,10 +122,9 @@ private readonly AppDataContext _context;
             return BadRequest(e.Message);
         }
     }
-
     [HttpPut]
-    [Route("deletarUsuario/{idGrupo}/{idUsuario}")]
-    public IActionResult DeletarUsuario([FromRoute] int idGrupo, [FromRoute] int idUsuario)
+    [Route("deletar-usuario-operacional/{idGrupo}/{idUsuario}")]
+    public IActionResult DeletarUsuarioOperacional([FromRoute] int idGrupo, [FromRoute] int idUsuario)
     {
         try
         {
@@ -168,8 +167,8 @@ private readonly AppDataContext _context;
     }
     //PUT - adicionar e retirar usuário Gerenciador
     [HttpPut]
-    [Route("adicionarGerencia/{idGrupo}/{idUsuarioGerencial}")]
-    public IActionResult AdicionarGerencia([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
+    [Route("adicionar-usuario-gerencial/{idGrupo}/{idUsuarioGerencial}")]
+    public IActionResult AdicionarUsuarioGerencia([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
     {
         try
         {
@@ -179,7 +178,7 @@ private readonly AppDataContext _context;
 
             UsuarioGerencial? usuarioGerencial = _context.UsuariosGerenciais.FirstOrDefault(x => x.UsuarioId == idUsuarioGerencial);
 
-            if(usuarioGerencial != null && usuarioGerencial.Tipo == "Gerencial"){
+            if(usuarioGerencial == null){
                 if (grupoCadastrado != null)
                 {
                     grupoCadastrado.Gerenciador = usuarioGerencial;
@@ -190,7 +189,7 @@ private readonly AppDataContext _context;
                 return NotFound("Grupo não existe");
             };
 
-            return NotFound("Usuário não existe ou não é Gerencial");
+            return NotFound("Grupo já tem gerenciados, favor deletá-lo antes");
         }
         catch (Exception e)
         {
@@ -199,8 +198,8 @@ private readonly AppDataContext _context;
     }
 
     [HttpPut]
-    [Route("deletarGerencia/{idGrupo}")]
-    public IActionResult DeletarGerencia([FromRoute] int idGrupo)
+    [Route("deletar-usuario-gerencial/{idGrupo}")]
+    public IActionResult DeletarUsuarioGerencia([FromRoute] int idGrupo)
     {
         try
         {
