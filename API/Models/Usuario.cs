@@ -10,6 +10,7 @@ public class Usuario
     public string? Senha { get; set; }
     public string? DataNascimento { get; set; }
     public bool? Logado { get; set; }
+    public string? Tipo { get; set; }
     public List<Tarefa>? Tarefas { get; set; }
     public DateTime DataCadastro { get; set; }
 }

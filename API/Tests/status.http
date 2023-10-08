@@ -1,0 +1,34 @@
+### Listar Prioridades ###
+GET https://localhost:7134/api/status/listar
+
+### Criar Prioridade ###
+POST https://localhost:7134/api/status/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Iniciado",
+    "descricao": "Projeto/Atividade iniciado"
+}
+/*{
+    "nome": "Pausado",
+    "descricao": "Projeto/Atividade em estado de pausa"
+}
+{
+    "nome": "Finalizado",
+    "descricao": "Projeto/Atividade finalizado"
+}*/
+
+###Alterar###
+PUT https://localhost:7134/api/status/alterar/1
+Content-Type: application/json
+
+{
+    "nome": "Pausado",
+    "descricao": "alteração realizada"
+}
+
+
+###Deletar###
+DELETE https://localhost:7134/api/status/deletar/2
+
+

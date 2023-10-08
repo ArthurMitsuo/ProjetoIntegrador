@@ -4,7 +4,8 @@ namespace API;
 using System.Security.Cryptography;
 using System.Text;
 
-
+[ApiController]
+[Route("api/usuario")]
 public class UsuarioController : ControllerBase
 {
     private readonly AppDataContext _context;
@@ -12,6 +13,7 @@ public class UsuarioController : ControllerBase
         _context = context;
     }
 
+    //listam todos os usuários
     [HttpGet]
     [Route("listar")]
     public IActionResult Listar(){
@@ -102,7 +104,7 @@ public class UsuarioController : ControllerBase
         }
     }
 
-    //Metodo Listar Tarefa de usuario, chamando pelo ID
+    //Metodo Listar Tarefa de usuario, chamando pelo ID do Usuario
     [HttpGet]
     [Route("listarTarefasUsuario/{id}")]
     public IActionResult ListarTarefasDoUsuario([FromRoute]int id, [FromBody] Usuario usuario)
@@ -128,13 +130,20 @@ public class UsuarioController : ControllerBase
         }
     }
 
-    //----
+    //----TAREFAS---
     //Metodo Listar Todas as Tarefas - Usuários Admin e Gerencial; Buscar do Route das Tarefas - GET
     //Metodo Criar Novas Tarefas - Todos os Usuários; Buscar do Route das Tarefas - POST
     //Metodo Alterar Tarefas - Todos os Usuarios; Buscar do Route das Tarefas - PUT
     //Metodo Deletar - Apenas o Admin; Buscar do Route das Tarefas - DELETE
     //Método de adicionar comentário em tarefa - Apenas Gerencial e Admin; Buscar do Route das Tarefas - PUT
-    //----
+    //-------------
+
+    //----GRUPOS---
+    //Metodo Listar Todas os Grupos - Usuários Admin e Gerencial; Buscar do Route dos Grupos - GET
+    //Metodo Criar Novos Grupos - Todos os Usuários; Buscar do Route dos Grupos - POST
+    //Metodo Alterar Grupos - Apenas o Admin; Buscar do Route dos Grupos - PUT
+    //Metodo Deletar - Apenas o Admin; Buscar do Route das Grupos - DELETE
+    //-------------
 
 
     //------Sessão para criptografia de senha de usuário--------

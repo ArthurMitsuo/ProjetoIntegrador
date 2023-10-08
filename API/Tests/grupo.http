@@ -1,0 +1,34 @@
+### Listar Grupos ###
+GET https://localhost:7134/api/grupo/listar
+
+### Criar Grupo ###
+POST https://localhost:7134/api/grupo/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Tropical",
+    "descricao": "Equi"
+}
+{
+    "nome": "Oceano Pacífico",
+    "descricao": "Indicação de que a prioridade não é urgente"
+}
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade não é urgente"
+}
+
+###Alterar###
+PUT https://localhost:7134/api/grupo/alterar/1
+Content-Type: application/json
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade nbiriri"
+}
+
+
+###Deletar###
+DELETE https://localhost:7134/api/grupo/deletar/2
+
+

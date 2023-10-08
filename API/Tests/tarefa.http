@@ -1,0 +1,26 @@
+### Listar Prioridades ###
+GET https://localhost:7134/api/tarefa/listar
+
+### Criar Prioridade ###
+POST https://localhost:7134/api/tarefa/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade não é urgente"
+}
+
+###Alterar###
+PUT https://localhost:7134/api/tarefa/alterar/1
+Content-Type: application/json
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade nbiriri"
+}
+
+
+###Deletar###
+DELETE https://localhost:7134/api/tarefa/deletar/2
+
+

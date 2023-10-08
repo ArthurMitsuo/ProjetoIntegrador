@@ -83,7 +83,6 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
                 tarefaCadastro.Usuario = tarefa.Usuario;
                 tarefaCadastro.Descricao = tarefa.Descricao;
                 //Comentários são adicionados por usuários GERENCIAL e ADMIN
-                //tarefaCadastro.Comentarios = tarefa.Comentarios;
                 tarefaCadastro.Corpo = tarefa.Corpo;
                 tarefaCadastro.Prioridade = tarefa.Prioridade;
                 _context.SaveChanges();
@@ -97,7 +96,7 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
         }
     }
 
-    //Método de adicionar comentário em tarefa
+    //Método de adicionar comentário em tarefa - apenas Users Admin e Gerencial
     [HttpPut]
     [Route("adicionarComentario/{id}")]
     public IActionResult AdicionarComentario([FromRoute]int id, 
