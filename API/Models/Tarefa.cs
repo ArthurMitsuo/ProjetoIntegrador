@@ -2,6 +2,8 @@
 
 public class Tarefa
 {
+    internal int Id;
+
     public Tarefa() => CriadoEm = DateTime.Now;
 
     public int TarefaId { get; set; }

@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 
+
 public class UsuarioController : ControllerBase,ManipulacaoTarefa
 {
     private readonly AppDataContext _context;
@@ -128,7 +129,7 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
                 return BadRequest(e.Message);
             }
         }
-    }
+    
 
 
         //------Sessão para criptografia de senha de usuário--------
@@ -174,5 +175,44 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
             return senhaHashed == hash;
         }
     
+    [HttpPut("tarefa/{tarefaId}/adicionar-comentario")]
+    public IActionResult AdicionarComentario(int tarefaId, [FromBody] Comentario novoComentario)
+    {
+        try
+        {
+        // Verifique se a tarefa existe
+        var tarefa = _context.Tarefas.FirstOrDefault(t => t.Id == tarefaId);
+
+        if (tarefa == null)
+        {
+            return NotFound("Tarefa não encontrada");
+        }
+
+        // Verifique se o usuário tem permissão para adicionar um comentário (apenas Gerencial e Admin, por exemplo)
+        if (!UsuarioTemPermissaoParaAdicionarComentario())
+        {
+            return Forbid("Você não tem permissão para adicionar comentários a esta tarefa");
+        }
+
+            // Adicione o comentário à tarefa
+            novoComentario.TarefaId = tarefa.Id;
+                _context.Comentarios.Add(novoComentario); // Adicionar o novo comentário ao contexto
+                _context.SaveChanges(); // Salvar as mudanças no banco de dados
+
+
+            return Ok(novoComentario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    private bool UsuarioTemPermissaoParaAdicionarComentario()
+    {
+        throw new NotImplementedException();
+    }
 }
+
+
 

@@ -1,6 +1,7 @@
 ﻿using API;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace API.Data;
 
 public class AppDataContext : DbContext
@@ -17,6 +18,7 @@ public class AppDataContext : DbContext
     public DbSet<Status> Status {get; set;}
     public DbSet<Tarefa> Tarefas {get; set;}
     public DbSet<Usuario> Usuarios {get; set;}
+    public DbSet<Comentario> Comentarios { get; set; }
 
     //Mapeamento da herança das classes Tarefa e Usuario com TUTTH, mapeando e criando novo campo com o valor
     protected override void OnModelCreating(ModelBuilder modelBuilder)
