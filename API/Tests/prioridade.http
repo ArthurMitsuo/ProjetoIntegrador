@@ -9,3 +9,18 @@ Content-Type: application/json
     "nome": "Regular",
     "descricao": "Indicação de que a prioridade não é urgente"
 }
+
+###Alterar###
+PUT https://localhost:7134/api/prioridade/alterar/1
+Content-Type: application/json
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade nbiriri"
+}
+
+
+###Deletar###
+DELETE https://localhost:7134/api/prioridade/deletar/2
+
+
