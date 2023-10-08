@@ -103,32 +103,33 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
     }
 
     //Metodo Listar Tarefa de usuarios
-    [HttpGet("tarefas/ListarTarefas")]
-        public IActionResult ListarTarefasDoUsuario(int id)
+    [HttpGet]
+    [Route("listarTarefasUsuario/{id}")]
+    public IActionResult ListarTarefasDoUsuario(int id)
+    {
+        try
         {
-            try
+            // Primeiro, verifique se o usuário existe
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.UsuarioId == id);
+
+            if (usuario == null)
             {
-                // Primeiro, verifique se o usuário existe
-                var usuario = _context.Usuarios.FirstOrDefault(u => u.UsuarioId == id);
-
-                if (usuario == null)
-                {
-                    return NotFound("Usuário não encontrado");
-                }
-
-                // Em seguida, recupere as tarefas do usuário com base no seu ID
-                var tarefasDoUsuario = _context.Tarefas
-                    .Where(t => t.UsuarioId == id)
-                    .ToList();
-
-                return Ok(tarefasDoUsuario);
+                return NotFound("Usuário não encontrado");
             }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+
+            // Em seguida, recupere as tarefas do usuário com base no seu ID
+            var tarefasDoUsuario = usuario.Tarefas;
+            //var tarefasDoUsuario = _context.Usuarios
+            //    .Where(t => t.UsuarioId == id);                    
+
+            return Ok(tarefasDoUsuario);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
         }
     }
+    
 
 
         //------Sessão para criptografia de senha de usuário--------
