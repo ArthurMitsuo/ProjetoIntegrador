@@ -4,7 +4,7 @@ using API.Data;
 
 [ApiController]
 [Route("api/tarefa")]
-public class TarefaController : ControllerBase
+public class TarefaController : ControllerBase, ManipulacaoTarefa
 {
     private readonly AppDataContext _context;
     public TarefaController(AppDataContext context){
@@ -25,7 +25,7 @@ public class TarefaController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: para todos os usuários
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Tarefa tarefa)

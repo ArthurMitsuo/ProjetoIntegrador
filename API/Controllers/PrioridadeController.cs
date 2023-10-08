@@ -26,7 +26,7 @@ public class PrioridadeController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: exclusivo para usuário admin
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Prioridade prioridade)

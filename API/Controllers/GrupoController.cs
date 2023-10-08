@@ -25,7 +25,7 @@ private readonly AppDataContext _context;
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: exclusivo para usuário admin
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Grupo grupo)

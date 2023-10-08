@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Data;
 namespace API;
+using System.Security.Cryptography;
+using System.Text;
 
-public class UsuarioController : ControllerBase
+
+public class UsuarioController : ControllerBase,ManipulacaoTarefa
 {
     private readonly AppDataContext _context;
     public UsuarioController(AppDataContext context){
@@ -23,13 +26,23 @@ public class UsuarioController : ControllerBase
         }
     }
 
-    // POST: api/categoria/cadastrar
+    // POST: Exclusivo para usuário Admin
     [HttpPost]
     [Route("cadastrar")]
     public IActionResult Cadastrar([FromBody] Usuario usuario)
     {
         try
         {
+            string? usuarioSenha = usuario.Senha;
+
+            // Gerar um salt aleatório (um valor único para cada usuário)
+            byte[] salt = GenerateSalt();
+
+            // Gerar o hash da senha com o salt
+            string senhaHashed = HashPassword(usuarioSenha, salt);
+
+            usuario.Senha = senhaHashed;
+
             _context.Add(usuario);
             _context.SaveChanges();
             return Created("", usuario);
@@ -88,6 +101,7 @@ public class UsuarioController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
     //Metodo Listar Tarefa de usuarios
     [HttpGet("tarefas/ListarTarefas")]
         public IActionResult ListarTarefasDoUsuario(int id)
@@ -115,3 +129,50 @@ public class UsuarioController : ControllerBase
             }
         }
     }
+
+
+        //------Sessão para criptografia de senha de usuário--------
+        // Gera um salt aleatório
+        public static byte[] GenerateSalt()
+        {   
+            byte[] salt = new byte[16];
+            RandomNumberGenerator.Fill(salt);
+            return salt;
+        }
+
+        // Gera o hash da senha usando o salt
+        public static string HashPassword(string? senha, byte[] salt)
+        {
+            if (senha == null)
+            {
+                throw new ArgumentNullException(nameof(senha), "A senha não pode ser nula.");
+            }
+
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] senhaBytes = Encoding.UTF8.GetBytes(senha);
+                byte[] senhaComSalt = new byte[senhaBytes.Length + salt.Length];
+
+                for (int i = 0; i < senhaBytes.Length; i++)
+                {
+                    senhaComSalt[i] = senhaBytes[i];
+                }
+                for (int i = 0; i < salt.Length; i++)
+                {
+                    senhaComSalt[senhaBytes.Length + i] = salt[i];
+                }
+
+                byte[] hashedPassword = sha256.ComputeHash(senhaComSalt);
+                return Convert.ToBase64String(hashedPassword);
+            }
+        }
+
+        // Verifica se uma senha fornecida corresponde ao hash armazenado
+        public static bool VerifyPassword(string senha, byte[] salt, string hash)
+        {
+            string senhaHashed = HashPassword(senha, salt);
+            return senhaHashed == hash;
+        }
+    
+}
+
