@@ -118,9 +118,7 @@ public class UsuarioController : ControllerBase,ManipulacaoTarefa
             }
 
             // Em seguida, recupere as tarefas do usuário com base no seu ID
-            var tarefasDoUsuario = usuario.Tarefas;
-            //var tarefasDoUsuario = _context.Usuarios
-            //    .Where(t => t.UsuarioId == id);                    
+            var tarefasDoUsuario = usuario.Tarefas;                  
 
             return Ok(tarefasDoUsuario);
         }
