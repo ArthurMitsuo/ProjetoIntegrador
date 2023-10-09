@@ -1,22 +1,28 @@
-### Listar Prioridades ###
-GET https://localhost:7134/api/usuario/listar
+### Listar Usuarios ###
+GET https://localhost:7134/api/usuario/operacional/listar
 
-### Criar Prioridade ###
-POST https://localhost:7134/api/usuario/cadastrar
+### Criar Usuario ###
+POST https://localhost:7134/api/usuario/gerencial/cadastrar
 Content-Type: application/json
 
 {
-    "nome": "Regular",
-    "descricao": "Indicação de que a prioridade não é urgente"
+    "nome": "Barbara",
+    "login": "barbara",
+    "senha" : "1234",
+    "datanascimento" : "22/08/1996",
+    "logado" : false
 }
 
 ###Alterar###
-PUT https://localhost:7134/api/usuario/alterar/1
+PUT https://localhost:7134/api/usuario/gerencial/alterar
 Content-Type: application/json
 
 {
-    "nome": "Regular",
-    "descricao": "Indicação de que a prioridade nbiriri"
+    "nome": "Barbara",
+    "login": "barbara",
+    "senha" : "1234",
+    "datanascimento" : "22/08/1996",
+    "logado" : false
 }
 
 

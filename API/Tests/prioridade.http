@@ -5,24 +5,25 @@ GET https://localhost:7134/api/prioridade/listar
 POST https://localhost:7134/api/prioridade/cadastrar
 Content-Type: application/json
 
-{
-    "nome": "Regular",
-    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
-}
-/*
-{
-    "nome": "Mínima",
-    "descricao": "Indicação de que a prioridade não é urgente e também não muito importante"
-}
-{
-    "nome": "Regular",
-    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
-}
-{
-    "nome": "Urgente",
-    "descricao": "Indicação de que a prioridade urgente e tem que ter prioridade"
-}
-*/
+#{
+#    "nome": "Regular",
+#    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
+#}
+
+#{
+#    "nome": "Mínima",
+#    "descricao": "Indicação de que a prioridade não é urgente e também não muito importante"
+#}
+
+#{
+#    "nome": "Regular",
+#    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
+#}
+
+#{
+#    "nome": "Urgente",
+#    "descricao": "Indicação de que a prioridade urgente e tem que ter prioridade"
+#}
 
 ###Alterar###
 PUT https://localhost:7134/api/prioridade/alterar/1
@@ -35,6 +36,6 @@ Content-Type: application/json
 
 
 ###Deletar###
-DELETE https://localhost:7134/api/prioridade/deletar/2
+DELETE https://localhost:7134/api/prioridade/deletar/1
 
 

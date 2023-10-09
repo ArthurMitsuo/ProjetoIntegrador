@@ -1,4 +1,6 @@
-﻿namespace API;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace API;
 
 public class Usuario
 {
@@ -11,6 +13,7 @@ public class Usuario
     public string? DataNascimento { get; set; }
     public bool? Logado { get; set; }
     public string? Tipo { get; set; }
-    public List<Tarefa>? Tarefas { get; set; }
+    [NotMapped]
+    public ICollection<Tarefa>? Tarefa { get; set;}
     public DateTime DataCadastro { get; set; }
 }

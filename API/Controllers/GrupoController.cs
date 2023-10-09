@@ -11,6 +11,7 @@ private readonly AppDataContext _context;
         _context=context;
     }
 
+    //GET - listar os grupos
     [HttpGet]
     [Route("listar")]
     public IActionResult Listar(){
@@ -219,6 +220,29 @@ private readonly AppDataContext _context;
                 }
             }
             return NotFound("Grupo não existe");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    //Métodos para ver usuários em um grupo
+    //GET - listar os grupos
+    [HttpGet]
+    [Route("listar/listar-operacional/{id}")]
+    public IActionResult ListarUsuariosOperacionaisDoGrupo([FromRoute] int id){
+        try
+        {
+            Grupo? grupoCadastrado =
+                _context.Grupos.FirstOrDefault(x => x.GrupoId == id);
+
+            if(grupoCadastrado != null){
+                List<UsuarioOperacional> usuarios = grupoCadastrado.UsuariosOperacionais;
+                return Ok(usuarios);
+            }else{
+                return NotFound("Grupo não encontrado");
+            }
         }
         catch (Exception e)
         {

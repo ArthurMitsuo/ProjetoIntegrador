@@ -319,7 +319,7 @@ public class UsuarioController : ControllerBase
             }
 
             // Em seguida, recupere as tarefas do usuário
-            var tarefasDoUsuario = usuario.Tarefas;
+            var tarefasDoUsuario = usuario.Tarefa;
 
             return Ok(tarefasDoUsuario);
         }
@@ -344,7 +344,7 @@ public class UsuarioController : ControllerBase
             }
 
             // Em seguida, recupere as tarefas do usuário
-            var tarefasDoUsuario = usuario.Tarefas;
+            var tarefasDoUsuario = usuario.Tarefa;
 
             return Ok(tarefasDoUsuario);
         }
@@ -353,6 +353,7 @@ public class UsuarioController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
 
     //----TAREFAS---
     //Metodo Listar Todas as Tarefas - Usuários Admin e Gerencial; Buscar do Route das Tarefas - GET

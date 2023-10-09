@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    [Migration("20231007042550_SegundaMigracao")]
+    [Migration("20231009014253_SegundaMigracao")]
     partial class SegundaMigracao
     {
         /// <inheritdoc />
@@ -43,7 +43,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Grupo", b =>
                 {
                     b.Property<int>("GrupoId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CriadoEm")
@@ -158,6 +157,9 @@ namespace API.Migrations
                     b.Property<string>("DataNascimento")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool?>("Logado")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Login")
                         .HasColumnType("TEXT");
 
@@ -205,11 +207,6 @@ namespace API.Migrations
                 {
                     b.HasBaseType("API.Usuario");
 
-                    b.Property<int?>("GrupoId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasIndex("GrupoId");
-
                     b.HasDiscriminator().HasValue("Gerencial");
                 });
 
@@ -222,13 +219,18 @@ namespace API.Migrations
 
                     b.HasIndex("GrupoId");
 
-                    b.ToTable("Usuarios", t =>
-                        {
-                            t.Property("GrupoId")
-                                .HasColumnName("UsuarioOperacional_GrupoId");
-                        });
-
                     b.HasDiscriminator().HasValue("Operacional");
+                });
+
+            modelBuilder.Entity("API.Grupo", b =>
+                {
+                    b.HasOne("API.UsuarioGerencial", "Gerenciador")
+                        .WithOne("Grupo")
+                        .HasForeignKey("API.Grupo", "GrupoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gerenciador");
                 });
 
             modelBuilder.Entity("API.Tarefa", b =>
@@ -242,7 +244,7 @@ namespace API.Migrations
                         .HasForeignKey("StatusId");
 
                     b.HasOne("API.Usuario", "Usuario")
-                        .WithMany("Tarefas")
+                        .WithMany()
                         .HasForeignKey("UsuarioId");
 
                     b.Navigation("Prioridade");
@@ -252,27 +254,23 @@ namespace API.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("API.UsuarioGerencial", b =>
-                {
-                    b.HasOne("API.Grupo", "Grupo")
-                        .WithMany()
-                        .HasForeignKey("GrupoId");
-
-                    b.Navigation("Grupo");
-                });
-
             modelBuilder.Entity("API.UsuarioOperacional", b =>
                 {
                     b.HasOne("API.Grupo", "Grupo")
-                        .WithMany()
+                        .WithMany("UsuariosOperacionais")
                         .HasForeignKey("GrupoId");
 
                     b.Navigation("Grupo");
                 });
 
-            modelBuilder.Entity("API.Usuario", b =>
+            modelBuilder.Entity("API.Grupo", b =>
                 {
-                    b.Navigation("Tarefas");
+                    b.Navigation("UsuariosOperacionais");
+                });
+
+            modelBuilder.Entity("API.UsuarioGerencial", b =>
+                {
+                    b.Navigation("Grupo");
                 });
 #pragma warning restore 612, 618
         }
