@@ -107,7 +107,7 @@ private readonly AppDataContext _context;
 
             if(usuarioOperacional != null && usuarioOperacional.Tipo == "Operacional"){
                 if (grupoCadastrado != null)   {
-                    grupoCadastrado.UsuariosOperacionais.Add(usuarioOperacional);
+                    grupoCadastrado.UsuariosOperacionais?.Add(usuarioOperacional);
                     _context.Grupos.Update(grupoCadastrado);
                     _context.SaveChanges();
                     return Ok();
@@ -135,22 +135,19 @@ private readonly AppDataContext _context;
             
             Usuario? usuarioOperacional =  
                 _context.Usuarios.FirstOrDefault(x => x.UsuarioId == idUsuario);
-            
-            int index = 0;
-
+        
             if(usuarioOperacional != null && usuarioOperacional.Tipo == "Operacional"){
                 if (grupoCadastrado != null)
                     {   
-                        List<UsuarioOperacional>? listaAux = grupoCadastrado.UsuariosOperacionais;
+                        ICollection<UsuarioOperacional>? listaAux = grupoCadastrado.UsuariosOperacionais;
                         if(listaAux == null){
                             return NotFound("Nenhum usuário no grupo ainda, impossível deletar");
                         }
-                        for(int i = 0; i < listaAux.Count; i++){
-                            if(listaAux[i].UsuarioId==usuarioOperacional.UsuarioId){
-                                index = i;
+                        for(int i = 0; i < listaAux?.Count; i++){
+                            if(listaAux?.ElementAt(i).UsuarioId==usuarioOperacional.UsuarioId){
+                            _ = (grupoCadastrado.UsuariosOperacionais?.Remove(listaAux.ElementAt(i)));
                             }
                         }
-                        grupoCadastrado.UsuariosOperacionais.RemoveAt(index);
                         _context.Grupos.Update(grupoCadastrado);
                         _context.SaveChanges();
                         return Ok();
@@ -237,11 +234,11 @@ private readonly AppDataContext _context;
             Grupo? grupoCadastrado =
                 _context.Grupos.FirstOrDefault(x => x.GrupoId == id);
 
-            if(grupoCadastrado != null){
-                List<UsuarioOperacional> usuarios = grupoCadastrado.UsuariosOperacionais;
+            if(grupoCadastrado != null && grupoCadastrado.UsuariosOperacionais != null){
+                ICollection<UsuarioOperacional> usuarios = grupoCadastrado.UsuariosOperacionais;
                 return Ok(usuarios);
             }else{
-                return NotFound("Grupo não encontrado");
+                return NotFound("Grupo/Usuário não encontrado");
             }
         }
         catch (Exception e)

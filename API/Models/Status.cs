@@ -7,5 +7,6 @@ public class Status
     public int StatusId { get; set; }
     public string? Nome { get; set; }
     public string? Descricao { get; set; }
+    public ICollection<Tarefa>? Tarefa { get; set;}
     public DateTime CriadoEm { get; set; }
 }

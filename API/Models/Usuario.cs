@@ -13,7 +13,6 @@ public class Usuario
     public string? DataNascimento { get; set; }
     public bool? Logado { get; set; }
     public string? Tipo { get; set; }
-    [NotMapped]
     public ICollection<Tarefa>? Tarefa { get; set;}
     public DateTime DataCadastro { get; set; }
 }
