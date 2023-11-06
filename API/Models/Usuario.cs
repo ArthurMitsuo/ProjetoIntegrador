@@ -11,8 +11,8 @@ public class Usuario
     public string? Login { get; set; }
     public string? Senha { get; set; }
     public string? DataNascimento { get; set; }
+    //public string? Tipo { get; set; }
     public bool? Logado { get; set; }
-    public string? Tipo { get; set; }
-    public ICollection<Tarefa>? Tarefa { get; set;}
+    public ICollection<Tarefa> Tarefa { get; set;} = new List<Tarefa>();
     public DateTime DataCadastro { get; set; }
 }

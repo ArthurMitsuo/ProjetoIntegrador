@@ -105,7 +105,7 @@ private readonly AppDataContext _context;
             UsuarioOperacional? usuarioOperacional =  
                 _context.UsuariosOperacionais.FirstOrDefault(x => x.UsuarioId == idUsuario);
 
-            if(usuarioOperacional != null && usuarioOperacional.Tipo == "Operacional"){
+            if(usuarioOperacional != null){
                 if (grupoCadastrado != null)   {
                     grupoCadastrado.UsuariosOperacionais?.Add(usuarioOperacional);
                     _context.Grupos.Update(grupoCadastrado);
@@ -136,7 +136,7 @@ private readonly AppDataContext _context;
             Usuario? usuarioOperacional =  
                 _context.Usuarios.FirstOrDefault(x => x.UsuarioId == idUsuario);
         
-            if(usuarioOperacional != null && usuarioOperacional.Tipo == "Operacional"){
+            if(usuarioOperacional != null ){
                 if (grupoCadastrado != null)
                     {   
                         ICollection<UsuarioOperacional>? listaAux = grupoCadastrado.UsuariosOperacionais;

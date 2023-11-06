@@ -5,10 +5,11 @@ GET https://localhost:7134/api/prioridade/listar
 POST https://localhost:7134/api/prioridade/cadastrar
 Content-Type: application/json
 
-#{
-#    "nome": "Regular",
-#    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
-#}
+
+{
+    "nome": "Regular",
+    "descricao": "Indicação de que a prioridade não é urgente, mas manter a atenção quanto a ela"
+}
 
 #{
 #    "nome": "Mínima",

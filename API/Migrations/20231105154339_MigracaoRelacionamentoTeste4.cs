@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class SegundaMigracao : Migration
+    public partial class MigracaoRelacionamentoTeste4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -81,8 +81,8 @@ namespace API.Migrations
                     Senha = table.Column<string>(type: "TEXT", nullable: true),
                     DataNascimento = table.Column<string>(type: "TEXT", nullable: true),
                     Logado = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     DataCadastro = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     GrupoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -106,9 +106,9 @@ namespace API.Migrations
                     UsuarioId = table.Column<int>(type: "INTEGER", nullable: true),
                     Descricao = table.Column<string>(type: "TEXT", nullable: true),
                     Corpo = table.Column<string>(type: "TEXT", nullable: true),
-                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     PrioridadeId = table.Column<int>(type: "INTEGER", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Tipo = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

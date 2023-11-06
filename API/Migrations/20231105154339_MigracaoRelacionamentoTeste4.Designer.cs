@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    [Migration("20231009014253_SegundaMigracao")]
-    partial class SegundaMigracao
+    [Migration("20231105154339_MigracaoRelacionamentoTeste4")]
+    partial class MigracaoRelacionamentoTeste4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -186,28 +186,28 @@ namespace API.Migrations
                 {
                     b.HasBaseType("API.Tarefa");
 
-                    b.HasDiscriminator().HasValue("Atividade");
+                    b.HasDiscriminator().HasValue("ATIVIDADE");
                 });
 
             modelBuilder.Entity("API.TarefaProjeto", b =>
                 {
                     b.HasBaseType("API.Tarefa");
 
-                    b.HasDiscriminator().HasValue("Projeto");
+                    b.HasDiscriminator().HasValue("PROJETO");
                 });
 
             modelBuilder.Entity("API.UsuarioAdmin", b =>
                 {
                     b.HasBaseType("API.Usuario");
 
-                    b.HasDiscriminator().HasValue("Admin");
+                    b.HasDiscriminator().HasValue("ADMIN");
                 });
 
             modelBuilder.Entity("API.UsuarioGerencial", b =>
                 {
                     b.HasBaseType("API.Usuario");
 
-                    b.HasDiscriminator().HasValue("Gerencial");
+                    b.HasDiscriminator().HasValue("GERENCIAL");
                 });
 
             modelBuilder.Entity("API.UsuarioOperacional", b =>
@@ -219,7 +219,7 @@ namespace API.Migrations
 
                     b.HasIndex("GrupoId");
 
-                    b.HasDiscriminator().HasValue("Operacional");
+                    b.HasDiscriminator().HasValue("OPERACIONAL");
                 });
 
             modelBuilder.Entity("API.Grupo", b =>
@@ -236,15 +236,15 @@ namespace API.Migrations
             modelBuilder.Entity("API.Tarefa", b =>
                 {
                     b.HasOne("API.Prioridade", "Prioridade")
-                        .WithMany()
+                        .WithMany("Tarefa")
                         .HasForeignKey("PrioridadeId");
 
                     b.HasOne("API.Status", "Status")
-                        .WithMany()
+                        .WithMany("Tarefa")
                         .HasForeignKey("StatusId");
 
                     b.HasOne("API.Usuario", "Usuario")
-                        .WithMany()
+                        .WithMany("Tarefa")
                         .HasForeignKey("UsuarioId");
 
                     b.Navigation("Prioridade");
@@ -266,6 +266,21 @@ namespace API.Migrations
             modelBuilder.Entity("API.Grupo", b =>
                 {
                     b.Navigation("UsuariosOperacionais");
+                });
+
+            modelBuilder.Entity("API.Prioridade", b =>
+                {
+                    b.Navigation("Tarefa");
+                });
+
+            modelBuilder.Entity("API.Status", b =>
+                {
+                    b.Navigation("Tarefa");
+                });
+
+            modelBuilder.Entity("API.Usuario", b =>
+                {
+                    b.Navigation("Tarefa");
                 });
 
             modelBuilder.Entity("API.UsuarioGerencial", b =>

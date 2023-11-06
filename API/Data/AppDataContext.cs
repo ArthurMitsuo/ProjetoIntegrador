@@ -29,14 +29,14 @@ public class AppDataContext : DbContext
         //Mapeamento da herança das classes Tarefa e Usuario com TUTTH, mapeando e criando novo campo com o valor.
         modelBuilder.Entity<Tarefa>()
             .HasDiscriminator<string>("Tipo")
-            .HasValue<TarefaAtividade>("Atividade")
-            .HasValue<TarefaProjeto>("Projeto");
+            .HasValue<TarefaAtividade>("ATIVIDADE")
+            .HasValue<TarefaProjeto>("PROJETO");
 
         modelBuilder.Entity<Usuario>()
             .HasDiscriminator<string>("Tipo")
-            .HasValue<UsuarioAdmin>("Admin")
-            .HasValue<UsuarioGerencial>("Gerencial")
-            .HasValue<UsuarioOperacional>("Operacional");   
+            .HasValue<UsuarioAdmin>("ADMIN")
+            .HasValue<UsuarioGerencial>("GERENCIAL")
+            .HasValue<UsuarioOperacional>("OPERACIONAL");   
 
         /*modelBuilder.Entity<Usuario>()
             .HasMany(u => u.Tarefa)

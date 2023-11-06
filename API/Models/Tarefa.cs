@@ -16,7 +16,7 @@ public class Tarefa
     [NotMapped]
     public List<string>? Comentarios { get; set; }
     public string? Corpo { get; set; }
-    public string? Tipo { get; set; }
+    //public string? Tipo { get; set; }
     public Prioridade? Prioridade { get; set; }
     public int? PrioridadeId { get; set; }
     public DateTime CriadoEm { get; set;}
