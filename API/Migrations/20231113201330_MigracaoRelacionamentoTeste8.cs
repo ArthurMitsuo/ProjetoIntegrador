@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoRelacionamentoTeste4 : Migration
+    public partial class MigracaoRelacionamentoTeste8 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,21 @@ namespace API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cargos", x => x.CargoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Grupos",
+                columns: table => new
+                {
+                    GrupoId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Nome = table.Column<string>(type: "TEXT", nullable: true),
+                    Descricao = table.Column<string>(type: "TEXT", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Grupos", x => x.GrupoId);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,20 +72,6 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Grupos",
-                columns: table => new
-                {
-                    GrupoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Nome = table.Column<string>(type: "TEXT", nullable: true),
-                    Descricao = table.Column<string>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Grupos", x => x.GrupoId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Usuarios",
                 columns: table => new
                 {
@@ -83,7 +84,8 @@ namespace API.Migrations
                     Logado = table.Column<bool>(type: "INTEGER", nullable: true),
                     DataCadastro = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Tipo = table.Column<string>(type: "TEXT", nullable: false),
-                    GrupoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    GrupoId = table.Column<int>(type: "INTEGER", nullable: true),
+                    UsuarioOperacional_GrupoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,6 +93,11 @@ namespace API.Migrations
                     table.ForeignKey(
                         name: "FK_Usuarios_Grupos_GrupoId",
                         column: x => x.GrupoId,
+                        principalTable: "Grupos",
+                        principalColumn: "GrupoId");
+                    table.ForeignKey(
+                        name: "FK_Usuarios_Grupos_UsuarioOperacional_GrupoId",
+                        column: x => x.UsuarioOperacional_GrupoId,
                         principalTable: "Grupos",
                         principalColumn: "GrupoId");
                 });
@@ -148,24 +155,18 @@ namespace API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_GrupoId",
                 table: "Usuarios",
-                column: "GrupoId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Grupos_Usuarios_GrupoId",
-                table: "Grupos",
                 column: "GrupoId",
-                principalTable: "Usuarios",
-                principalColumn: "UsuarioId",
-                onDelete: ReferentialAction.Cascade);
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuarios_UsuarioOperacional_GrupoId",
+                table: "Usuarios",
+                column: "UsuarioOperacional_GrupoId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Grupos_Usuarios_GrupoId",
-                table: "Grupos");
-
             migrationBuilder.DropTable(
                 name: "Cargos");
 

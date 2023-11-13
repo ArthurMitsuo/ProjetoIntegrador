@@ -40,6 +40,7 @@ namespace API.Migrations
             modelBuilder.Entity("API.Grupo", b =>
                 {
                     b.Property<int>("GrupoId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CriadoEm")
@@ -204,6 +205,12 @@ namespace API.Migrations
                 {
                     b.HasBaseType("API.Usuario");
 
+                    b.Property<int?>("GrupoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasIndex("GrupoId")
+                        .IsUnique();
+
                     b.HasDiscriminator().HasValue("GERENCIAL");
                 });
 
@@ -216,18 +223,13 @@ namespace API.Migrations
 
                     b.HasIndex("GrupoId");
 
+                    b.ToTable("Usuarios", t =>
+                        {
+                            t.Property("GrupoId")
+                                .HasColumnName("UsuarioOperacional_GrupoId");
+                        });
+
                     b.HasDiscriminator().HasValue("OPERACIONAL");
-                });
-
-            modelBuilder.Entity("API.Grupo", b =>
-                {
-                    b.HasOne("API.UsuarioGerencial", "Gerenciador")
-                        .WithOne("Grupo")
-                        .HasForeignKey("API.Grupo", "GrupoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Gerenciador");
                 });
 
             modelBuilder.Entity("API.Tarefa", b =>
@@ -251,6 +253,15 @@ namespace API.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("API.UsuarioGerencial", b =>
+                {
+                    b.HasOne("API.Grupo", "Grupo")
+                        .WithOne("Gerenciador")
+                        .HasForeignKey("API.UsuarioGerencial", "GrupoId");
+
+                    b.Navigation("Grupo");
+                });
+
             modelBuilder.Entity("API.UsuarioOperacional", b =>
                 {
                     b.HasOne("API.Grupo", "Grupo")
@@ -262,6 +273,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Grupo", b =>
                 {
+                    b.Navigation("Gerenciador");
+
                     b.Navigation("UsuariosOperacionais");
                 });
 
@@ -278,11 +291,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Usuario", b =>
                 {
                     b.Navigation("Tarefa");
-                });
-
-            modelBuilder.Entity("API.UsuarioGerencial", b =>
-                {
-                    b.Navigation("Grupo");
                 });
 #pragma warning restore 612, 618
         }

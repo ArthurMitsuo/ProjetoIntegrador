@@ -2,5 +2,5 @@
 
 public class UsuarioAdmin : Usuario
 {
-    public string Tipo { get; set; } = "ADMIN";
+    public new string Tipo { get; set; } = "ADMIN";
 }

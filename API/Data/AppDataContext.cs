@@ -38,25 +38,13 @@ public class AppDataContext : DbContext
             .HasValue<UsuarioGerencial>("GERENCIAL")
             .HasValue<UsuarioOperacional>("OPERACIONAL");   
 
-        /*modelBuilder.Entity<Usuario>()
-            .HasMany(u => u.Tarefa)
-            .WithOne(t => t.Usuario)
-            .HasForeignKey(e => e.FUsuarioId)
-            .IsRequired(false);*/
-
-        modelBuilder.Entity<UsuarioGerencial>()
-            .HasOne(g => g.Grupo) 
-            .WithOne(u => u.Gerenciador)
-            .HasForeignKey<Grupo>(u => u.GrupoId);
-
         modelBuilder.Entity<Grupo>()
-            .HasMany(g => g.UsuariosOperacionais) 
-            .WithOne(u => u.Grupo)    
-            .HasForeignKey(u => u.GrupoId)
-            .IsRequired(false); 
+            .HasMany(e => e.UsuariosOperacionais)
+            .WithOne(e => e.Grupo)
+            .HasForeignKey(e => e.GrupoId)
+            .IsRequired(false);
 
-        /*modelBuilder.Entity<Tarefa>()
-            .HasNoKey(); */  
+        
 
 
         base.OnModelCreating(modelBuilder);
