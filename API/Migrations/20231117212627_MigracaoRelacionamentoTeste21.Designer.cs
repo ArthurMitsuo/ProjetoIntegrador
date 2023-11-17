@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    [Migration("20231113201330_MigracaoRelacionamentoTeste8")]
-    partial class MigracaoRelacionamentoTeste8
+    [Migration("20231117212627_MigracaoRelacionamentoTeste21")]
+    partial class MigracaoRelacionamentoTeste21
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,7 +158,7 @@ namespace API.Migrations
                     b.Property<string>("DataNascimento")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool?>("Logado")
+                    b.Property<bool>("Logado")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Login")
@@ -208,8 +208,13 @@ namespace API.Migrations
                 {
                     b.HasBaseType("API.Usuario");
 
+                    b.Property<int?>("CargoId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("GrupoId")
                         .HasColumnType("INTEGER");
+
+                    b.HasIndex("CargoId");
 
                     b.HasIndex("GrupoId")
                         .IsUnique();
@@ -221,13 +226,21 @@ namespace API.Migrations
                 {
                     b.HasBaseType("API.Usuario");
 
+                    b.Property<int?>("CargoId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("GrupoId")
                         .HasColumnType("INTEGER");
+
+                    b.HasIndex("CargoId");
 
                     b.HasIndex("GrupoId");
 
                     b.ToTable("Usuarios", t =>
                         {
+                            t.Property("CargoId")
+                                .HasColumnName("UsuarioOperacional_CargoId");
+
                             t.Property("GrupoId")
                                 .HasColumnName("UsuarioOperacional_GrupoId");
                         });
@@ -258,20 +271,39 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.UsuarioGerencial", b =>
                 {
+                    b.HasOne("API.Cargo", "Cargo")
+                        .WithMany("UsuariosGerenciais")
+                        .HasForeignKey("CargoId");
+
                     b.HasOne("API.Grupo", "Grupo")
                         .WithOne("Gerenciador")
                         .HasForeignKey("API.UsuarioGerencial", "GrupoId");
+
+                    b.Navigation("Cargo");
 
                     b.Navigation("Grupo");
                 });
 
             modelBuilder.Entity("API.UsuarioOperacional", b =>
                 {
+                    b.HasOne("API.Cargo", "Cargo")
+                        .WithMany("UsuariosOperacionais")
+                        .HasForeignKey("CargoId");
+
                     b.HasOne("API.Grupo", "Grupo")
                         .WithMany("UsuariosOperacionais")
                         .HasForeignKey("GrupoId");
 
+                    b.Navigation("Cargo");
+
                     b.Navigation("Grupo");
+                });
+
+            modelBuilder.Entity("API.Cargo", b =>
+                {
+                    b.Navigation("UsuariosGerenciais");
+
+                    b.Navigation("UsuariosOperacionais");
                 });
 
             modelBuilder.Entity("API.Grupo", b =>

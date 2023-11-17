@@ -44,8 +44,18 @@ public class AppDataContext : DbContext
             .HasForeignKey(e => e.GrupoId)
             .IsRequired(false);
 
-        
+        modelBuilder.Entity<Cargo>()
+            .HasMany(e => e.UsuariosGerenciais)
+            .WithOne(e => e.Cargo)
+            .HasForeignKey(e => e.CargoId)
+            .IsRequired(false);
 
+
+        modelBuilder.Entity<Cargo>()
+            .HasMany(e => e.UsuariosOperacionais)
+            .WithOne(e => e.Cargo)
+            .HasForeignKey(e => e.CargoId)
+            .IsRequired(false);
 
         base.OnModelCreating(modelBuilder);
 

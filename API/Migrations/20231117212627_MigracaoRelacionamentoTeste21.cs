@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoRelacionamentoTeste8 : Migration
+    public partial class MigracaoRelacionamentoTeste21 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -81,15 +81,27 @@ namespace API.Migrations
                     Login = table.Column<string>(type: "TEXT", nullable: true),
                     Senha = table.Column<string>(type: "TEXT", nullable: true),
                     DataNascimento = table.Column<string>(type: "TEXT", nullable: true),
-                    Logado = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Logado = table.Column<bool>(type: "INTEGER", nullable: false),
                     DataCadastro = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     GrupoId = table.Column<int>(type: "INTEGER", nullable: true),
-                    UsuarioOperacional_GrupoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    CargoId = table.Column<int>(type: "INTEGER", nullable: true),
+                    UsuarioOperacional_GrupoId = table.Column<int>(type: "INTEGER", nullable: true),
+                    UsuarioOperacional_CargoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Usuarios", x => x.UsuarioId);
+                    table.ForeignKey(
+                        name: "FK_Usuarios_Cargos_CargoId",
+                        column: x => x.CargoId,
+                        principalTable: "Cargos",
+                        principalColumn: "CargoId");
+                    table.ForeignKey(
+                        name: "FK_Usuarios_Cargos_UsuarioOperacional_CargoId",
+                        column: x => x.UsuarioOperacional_CargoId,
+                        principalTable: "Cargos",
+                        principalColumn: "CargoId");
                     table.ForeignKey(
                         name: "FK_Usuarios_Grupos_GrupoId",
                         column: x => x.GrupoId,
@@ -113,9 +125,9 @@ namespace API.Migrations
                     UsuarioId = table.Column<int>(type: "INTEGER", nullable: true),
                     Descricao = table.Column<string>(type: "TEXT", nullable: true),
                     Corpo = table.Column<string>(type: "TEXT", nullable: true),
+                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     PrioridadeId = table.Column<int>(type: "INTEGER", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Tipo = table.Column<string>(type: "TEXT", nullable: false)
+                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -153,10 +165,20 @@ namespace API.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Usuarios_CargoId",
+                table: "Usuarios",
+                column: "CargoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_GrupoId",
                 table: "Usuarios",
                 column: "GrupoId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuarios_UsuarioOperacional_CargoId",
+                table: "Usuarios",
+                column: "UsuarioOperacional_CargoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_UsuarioOperacional_GrupoId",
@@ -168,9 +190,6 @@ namespace API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Cargos");
-
-            migrationBuilder.DropTable(
                 name: "Tarefas");
 
             migrationBuilder.DropTable(
@@ -181,6 +200,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Usuarios");
+
+            migrationBuilder.DropTable(
+                name: "Cargos");
 
             migrationBuilder.DropTable(
                 name: "Grupos");

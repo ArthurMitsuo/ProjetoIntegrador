@@ -19,10 +19,15 @@ private readonly AppDataContext _context;
     public IActionResult Listar(){
         try
         {
-            List<UsuarioOperacional> usuarioOperacionals =
+            /*List<UsuarioOperacional> usuarioOperacionals =
                 _context.UsuariosOperacionais
                 .Include(x => x.Grupo)
-                .ToList();
+                .ToList();*/
+            //Eager loading para carregar gerenciador e operacionais
+            var grupoRecuperado = _context.Grupos
+                .Include(g => g.UsuariosOperacionais)
+                .Include(g => g.Gerenciador)
+                .ToList();    
 
             List<Grupo> grupos = _context.Grupos.ToList();
             return Ok(grupos);
@@ -200,7 +205,7 @@ private readonly AppDataContext _context;
                             }
                         }
                         _context.Grupos.Update(grupoCadastrado);
-                        _context.SaveChanges();
+                        _context.SaveChangesAsync();
                         return Ok();
                     }else{
                         return NotFound("Grupo Não encontrado");
@@ -217,17 +222,19 @@ private readonly AppDataContext _context;
     //PUT - adicionar e retirar usuário Gerenciador
     [HttpPut]
     [Route("adicionar-usuario-gerencial/{idGrupo}/{idUsuarioGerencial}")]
-    public IActionResult AdicionarUsuarioGerencia([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
+    public async Task<IActionResult> AdicionarUsuarioGerenciaAsync([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
     {
         try
         {
             //Expressões lambda
-            Grupo? grupoCadastrado =
-                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
+            Grupo? grupoCadastrado = await _context.Grupos.FirstOrDefaultAsync(x => x.GrupoId == idGrupo);
 
-            UsuarioGerencial? usuarioGerencial = _context.UsuariosGerenciais.FirstOrDefault(x => x.UsuarioId == idUsuarioGerencial);
+            UsuarioGerencial? usuarioGerencial = await _context.UsuariosGerenciais.FirstOrDefaultAsync(x => x.UsuarioId == idUsuarioGerencial);
 
-            if(usuarioGerencial == null){
+            if(grupoCadastrado?.Gerenciador!=null){
+                return NotFound("Grupo já tem gerenciados, favor deletá-lo antes");
+            }
+            if(usuarioGerencial != null && usuarioGerencial.Tipo == "GERENCIAL"){
                 if (grupoCadastrado != null)
                 {
                     grupoCadastrado.Gerenciador = usuarioGerencial;
@@ -236,9 +243,11 @@ private readonly AppDataContext _context;
                     return Ok();
                 }
                 return NotFound("Grupo não existe");
+            }else{
+                return NotFound("Usuário não encontrado ou não é gerencial");  
             };
 
-            return NotFound("Grupo já tem gerenciados, favor deletá-lo antes");
+            
         }
         catch (Exception e)
         {
@@ -253,14 +262,22 @@ private readonly AppDataContext _context;
         try
         {
             //Expressões lambda
-            Grupo? grupoCadastrado =
-                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
+            /*Grupo? grupoCadastrado =
+                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);*/
 
-            if (grupoCadastrado != null)
+
+            //Utilização do Eager Loading para recuperar informações dos Usuários.
+            var grupoRecuperado = _context.Grupos
+                .Include(g => g.UsuariosOperacionais)
+                .Include(g => g.Gerenciador)
+                .FirstOrDefault(x => x.GrupoId == idGrupo);  
+
+
+            if (grupoRecuperado != null)
             {
-                if(grupoCadastrado.Gerenciador != null){
-                    grupoCadastrado.Gerenciador = null;
-                    _context.Grupos.Update(grupoCadastrado);
+                if(grupoRecuperado.Gerenciador != null && grupoRecuperado.Gerenciador.Tipo == "GERENCIAL"){
+                    grupoRecuperado.Gerenciador = null;
+                    _context.Grupos.Update(grupoRecuperado);
                     _context.SaveChanges();
                     return Ok();
                 }else{

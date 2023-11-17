@@ -1,6 +1,7 @@
 ﻿namespace API;
 using Microsoft.AspNetCore.Mvc;
 using API.Data;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/tarefa")]
@@ -18,8 +19,14 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     public IActionResult ListarTarefaProjeto(){
         try
         {
-            List<TarefaProjeto> tarefa = _context.TarefasProjeto.ToList();
-            return Ok(tarefa);
+            var tarefas = _context.Tarefas
+                .Include(u => u.Usuario)
+                .Include(p => p.Prioridade)
+                .Include(s => s.Status)
+                .ToList();
+
+            //List<TarefaProjeto> tarefa = _context.TarefasProjeto.ToList();
+            return Ok(tarefas);
         }
         catch (Exception e)
         {
@@ -32,8 +39,14 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     public IActionResult ListarTarefaAtividade(){
         try
         {
-            List<TarefaAtividade> tarefa = _context.TarefasAtividade.ToList();
-            return Ok(tarefa);
+            var tarefas = _context.Tarefas
+                .Include(u => u.Usuario)
+                .Include(p => p.Prioridade)
+                .Include(s => s.Status)
+                .ToList();
+
+            //List<TarefaAtividade> tarefa = _context.TarefasAtividade.ToList();
+            return Ok(tarefas);
         }
         catch (Exception e)
         {
@@ -143,7 +156,7 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
                 _context.SaveChanges();
                 return Ok();
             }
-            return NotFound();
+            return NotFound("Tarefa não encontrada");
         }
         catch (Exception e)
         {
@@ -185,16 +198,87 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
     [HttpPut]
     [Route("adicionarComentario/{id}")]
     public IActionResult AdicionarComentario([FromRoute]int id, 
-        [FromBody] Tarefa tarefa)
+        [FromBody] string comentario)
     {
         try
         {
             // Primeiro, verifique se a tarefa existe
-             Tarefa? tarefaCadastro = _context.Tarefas.FirstOrDefault(x => x.TarefaId == id);
+            Tarefa? tarefaCadastro = _context.Tarefas.FirstOrDefault(x => x.TarefaId == id);
+
 
             if (tarefaCadastro != null)
             {
-                tarefaCadastro.Comentarios = tarefa.Comentarios;
+                tarefaCadastro.Comentarios = new List<String>();
+                tarefaCadastro.Comentarios.Add(comentario);
+                _context.Tarefas.Update(tarefaCadastro);
+                _context.SaveChanges();
+                return Ok();
+            }else{
+                return NotFound("Tarefa não encontrada");
+            }             
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    //Método de alterar Status em tarefa - apenas Users Admin e Gerencial
+    [HttpPut]
+    [Route("alterar-status/{idTarefa}/{idStatus}")]
+    public async Task<IActionResult> AlteraStatus([FromRoute]int idTarefa, [FromRoute]int idStatus)
+    {
+        try
+        {
+            // Primeiro, verifique se a tarefa existe
+            Tarefa? tarefaCadastro = await _context.Tarefas
+                .Include(s => s.Status)
+                .FirstOrDefaultAsync(x => x.TarefaId == idTarefa);
+
+            Status? status = await _context.Status.FirstOrDefaultAsync(x=>x.StatusId == idStatus);
+
+            if(status == null){
+                return NotFound("Status não encontrado");
+            }
+
+            if (tarefaCadastro != null)
+            {
+                tarefaCadastro.Status = status;
+                _context.Tarefas.Update(tarefaCadastro);
+                _context.SaveChanges();
+                return Ok();
+            }else{
+                return NotFound("Tarefa não encontrada");
+            }             
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    //Método de alterar Prioridade em tarefa - apenas Users Admin e Gerencial
+    [HttpPut]
+    [Route("alterar-status/{idTarefa}/{idStatus}")]
+    public async Task<IActionResult> AlteraPrioridade([FromRoute]int idTarefa, [FromRoute]int idPrioridade)
+    {
+        try
+        {
+            // Primeiro, verifique se a tarefa existe
+            Tarefa? tarefaCadastro = await _context.Tarefas
+                .Include(s => s.Status)
+                .FirstOrDefaultAsync(x => x.TarefaId == idTarefa);
+
+            Prioridade? prioridade = await _context.Prioridades.FirstOrDefaultAsync(x=>x.PrioridadeId == idPrioridade);
+
+            if(prioridade == null){
+                return NotFound("Prioridade não encontrado");
+            }
+
+            if (tarefaCadastro != null)
+            {
+                tarefaCadastro.Prioridade = prioridade;
+                _context.Tarefas.Update(tarefaCadastro);
                 _context.SaveChanges();
                 return Ok();
             }else{

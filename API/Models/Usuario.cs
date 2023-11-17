@@ -4,7 +4,7 @@ namespace API;
 
 public class Usuario
 {
-    internal string? Tipo= string.Empty;
+    
 
     public Usuario() => DataCadastro = DateTime.Now;
 
@@ -14,8 +14,9 @@ public class Usuario
     public string? Senha { get; set; }
     public string? DataNascimento { get; set; }
     //public string? Tipo { get; set; }
-    public bool? Logado { get; set; } = false;
+    public bool Logado { get; set; } = false;
     public ICollection<Tarefa> Tarefa { get; set;} = new List<Tarefa>();
     public DateTime DataCadastro { get; set; }
+    public string? Tipo { get; set; }
 
 }
