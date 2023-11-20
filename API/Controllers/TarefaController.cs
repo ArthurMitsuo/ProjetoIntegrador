@@ -259,7 +259,7 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
 
     //Método de alterar Prioridade em tarefa - apenas Users Admin e Gerencial
     [HttpPut]
-    [Route("alterar-status/{idTarefa}/{idStatus}")]
+    [Route("alterar-prioridade/{idTarefa}/{idPrioridade}")]
     public async Task<IActionResult> AlteraPrioridade([FromRoute]int idTarefa, [FromRoute]int idPrioridade)
     {
         try
@@ -272,7 +272,7 @@ public class TarefaController : ControllerBase, ManipulacaoTarefa
             Prioridade? prioridade = await _context.Prioridades.FirstOrDefaultAsync(x=>x.PrioridadeId == idPrioridade);
 
             if(prioridade == null){
-                return NotFound("Prioridade não encontrado");
+                return NotFound("Prioridade não encontrada");
             }
 
             if (tarefaCadastro != null)
