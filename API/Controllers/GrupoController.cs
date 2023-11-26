@@ -1,6 +1,8 @@
 ﻿namespace API;
 using Microsoft.AspNetCore.Mvc;
 using API.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/grupo")]
@@ -17,6 +19,16 @@ private readonly AppDataContext _context;
     public IActionResult Listar(){
         try
         {
+            /*List<UsuarioOperacional> usuarioOperacionals =
+                _context.UsuariosOperacionais
+                .Include(x => x.Grupo)
+                .ToList();*/
+            //Eager loading para carregar gerenciador e operacionais
+            var grupoRecuperado = _context.Grupos
+                .Include(g => g.UsuariosOperacionais)
+                .Include(g => g.Gerenciador)
+                .ToList();    
+
             List<Grupo> grupos = _context.Grupos.ToList();
             return Ok(grupos);
         }
@@ -35,6 +47,21 @@ private readonly AppDataContext _context;
         {
             _context.Add(grupo);
             _context.SaveChanges();
+
+        // Agora que o Grupo foi salvo, você pode adicionar UsuariosOperacionais
+        // Certifique-se de que a propriedade UsuariosOperacionais esteja inicializada
+        if (grupo.UsuariosOperacionais != null)
+        {
+            foreach (var usuarioOperacional in grupo.UsuariosOperacionais)
+            {
+                // Adicione a lógica necessária para configurar o relacionamento e adicionar ao contexto
+                // Exemplo: usuarioOperacional.GrupoId = grupo.GrupoId;
+                _context.Add(usuarioOperacional);
+            }
+
+            _context.SaveChanges();
+        }
+
             return Created("", grupo);
         }
         catch (Exception e)
@@ -94,29 +121,55 @@ private readonly AppDataContext _context;
     //PUT - adicionar e retirar usuários Operadores
     [HttpPut]
     [Route("adicionar-usuario-operacional/{idGrupo}/{idUsuario}")]
-    public IActionResult AdicionaUsuarioOperacional([FromRoute] int idGrupo, [FromRoute] int idUsuario)
+    public async Task<IActionResult> AdicionaUsuarioOperacionalAsync([FromRoute] int idGrupo, [FromRoute] int idUsuario)
     {
         try
         {
-            //Expressões lambda
-            Grupo? grupoCadastrado =
-                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
-            
-            UsuarioOperacional? usuarioOperacional =  
-                _context.UsuariosOperacionais.FirstOrDefault(x => x.UsuarioId == idUsuario);
+        // Busca o Grupo
+        Grupo? grupoCadastrado = await _context.Grupos
+            .Include(g => g.UsuariosOperacionais)  // Certifique-se de incluir a coleção de UsuariosOperacionais
+            .FirstOrDefaultAsync(g => g.GrupoId == idGrupo);
 
-            if(usuarioOperacional != null){
-                if (grupoCadastrado != null)   {
-                    grupoCadastrado.UsuariosOperacionais?.Add(usuarioOperacional);
-                    _context.Grupos.Update(grupoCadastrado);
-                    _context.SaveChanges();
-                    return Ok();
-                }else{
-                    return NotFound("Grupo não encontrado");
+        // Busca o UsuarioOperacional
+        UsuarioOperacional? usuarioOperacional = await _context.UsuariosOperacionais
+            .FirstOrDefaultAsync(uo => uo.UsuarioId == idUsuario);
+
+
+        // Verifica se ambos foram encontrados
+        if (grupoCadastrado != null && usuarioOperacional != null)
+        {
+            foreach(Usuario usuarios in grupoCadastrado.UsuariosOperacionais){
+                if(usuarioOperacional.UsuarioId == usuarios.UsuarioId){
+                    return NotFound("Usuário já cadastrado no grupo");
                 }
-            }else{
-                return NotFound("Usuario não encontrado ou não é usupario Operacional");
             }
+            // Verifica se o usuário é do tipo "OPERACIONAL"
+            if (usuarioOperacional.Tipo == "OPERACIONAL")
+            {
+                // Inicializa a coleção se for nula
+                grupoCadastrado.UsuariosOperacionais ??= new List<UsuarioOperacional>();
+
+                // Adiciona o UsuarioOperacional à coleção do Grupo
+                grupoCadastrado.UsuariosOperacionais.Add(usuarioOperacional);
+
+                // Atualiza o Grupo no contexto
+                _context.Grupos.Update(grupoCadastrado);
+
+                // Salva as alterações
+                await _context.SaveChangesAsync();
+
+                // Retorna o objeto modificado, se necessário
+                return Ok(grupoCadastrado);
+            }
+            else
+            {
+                return NotFound("Usuário não é do tipo OPERACIONAL");
+            }
+        }
+        else
+        {
+            return NotFound("Grupo ou usuário não encontrado");
+        }
         }
         catch (Exception e)
         {
@@ -134,9 +187,12 @@ private readonly AppDataContext _context;
                 _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
             
             Usuario? usuarioOperacional =  
-                _context.Usuarios.FirstOrDefault(x => x.UsuarioId == idUsuario);
+                _context.UsuariosOperacionais
+                .FirstOrDefault(x => x.UsuarioId == idUsuario);
+
+
         
-            if(usuarioOperacional != null ){
+            if(usuarioOperacional != null && usuarioOperacional.Tipo == "OPERACIONAL"){
                 if (grupoCadastrado != null)
                     {   
                         ICollection<UsuarioOperacional>? listaAux = grupoCadastrado.UsuariosOperacionais;
@@ -144,12 +200,12 @@ private readonly AppDataContext _context;
                             return NotFound("Nenhum usuário no grupo ainda, impossível deletar");
                         }
                         for(int i = 0; i < listaAux?.Count; i++){
-                            if(listaAux?.ElementAt(i).UsuarioId==usuarioOperacional.UsuarioId){
+                            if(listaAux.ElementAt(i).UsuarioId==usuarioOperacional?.UsuarioId){
                             _ = (grupoCadastrado.UsuariosOperacionais?.Remove(listaAux.ElementAt(i)));
                             }
                         }
                         _context.Grupos.Update(grupoCadastrado);
-                        _context.SaveChanges();
+                        _context.SaveChangesAsync();
                         return Ok();
                     }else{
                         return NotFound("Grupo Não encontrado");
@@ -166,17 +222,19 @@ private readonly AppDataContext _context;
     //PUT - adicionar e retirar usuário Gerenciador
     [HttpPut]
     [Route("adicionar-usuario-gerencial/{idGrupo}/{idUsuarioGerencial}")]
-    public IActionResult AdicionarUsuarioGerencia([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
+    public async Task<IActionResult> AdicionarUsuarioGerenciaAsync([FromRoute] int idGrupo, [FromRoute] int idUsuarioGerencial)
     {
         try
         {
             //Expressões lambda
-            Grupo? grupoCadastrado =
-                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
+            Grupo? grupoCadastrado = await _context.Grupos.FirstOrDefaultAsync(x => x.GrupoId == idGrupo);
 
-            UsuarioGerencial? usuarioGerencial = _context.UsuariosGerenciais.FirstOrDefault(x => x.UsuarioId == idUsuarioGerencial);
+            UsuarioGerencial? usuarioGerencial = await _context.UsuariosGerenciais.FirstOrDefaultAsync(x => x.UsuarioId == idUsuarioGerencial);
 
-            if(usuarioGerencial == null){
+            if(grupoCadastrado?.Gerenciador!=null){
+                return NotFound("Grupo já tem gerenciados, favor deletá-lo antes");
+            }
+            if(usuarioGerencial != null && usuarioGerencial.Tipo == "GERENCIAL"){
                 if (grupoCadastrado != null)
                 {
                     grupoCadastrado.Gerenciador = usuarioGerencial;
@@ -185,9 +243,11 @@ private readonly AppDataContext _context;
                     return Ok();
                 }
                 return NotFound("Grupo não existe");
+            }else{
+                return NotFound("Usuário não encontrado ou não é gerencial");  
             };
 
-            return NotFound("Grupo já tem gerenciados, favor deletá-lo antes");
+            
         }
         catch (Exception e)
         {
@@ -202,14 +262,22 @@ private readonly AppDataContext _context;
         try
         {
             //Expressões lambda
-            Grupo? grupoCadastrado =
-                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);
+            /*Grupo? grupoCadastrado =
+                _context.Grupos.FirstOrDefault(x => x.GrupoId == idGrupo);*/
 
-            if (grupoCadastrado != null)
+
+            //Utilização do Eager Loading para recuperar informações dos Usuários.
+            var grupoRecuperado = _context.Grupos
+                .Include(g => g.UsuariosOperacionais)
+                .Include(g => g.Gerenciador)
+                .FirstOrDefault(x => x.GrupoId == idGrupo);  
+
+
+            if (grupoRecuperado != null)
             {
-                if(grupoCadastrado.Gerenciador != null){
-                    grupoCadastrado.Gerenciador = null;
-                    _context.Grupos.Update(grupoCadastrado);
+                if(grupoRecuperado.Gerenciador != null && grupoRecuperado.Gerenciador.Tipo == "GERENCIAL"){
+                    grupoRecuperado.Gerenciador = null;
+                    _context.Grupos.Update(grupoRecuperado);
                     _context.SaveChanges();
                     return Ok();
                 }else{

@@ -6,8 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDataContext>(
+
     options => options.UseSqlite("Data Source=projetoIntegrador.db;Cache=shared")
+
 );
+
+builder.Services.AddControllers().AddJsonOptions(x =>
+   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddControllers();
 
@@ -23,6 +28,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors
+(
+    c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+);
 
 app.UseHttpsRedirection();
 

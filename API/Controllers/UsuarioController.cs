@@ -3,6 +3,7 @@ using API.Data;
 namespace API;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/usuario")]
@@ -34,8 +35,13 @@ public class UsuarioController : ControllerBase
     public IActionResult ListarOperacional(){
         try
         {
-            List<UsuarioOperacional> usuario = _context.UsuariosOperacionais.ToList();
-            return Ok(usuario);
+            List<UsuarioOperacional> userOperacional = _context.UsuariosOperacionais
+                .Include(g => g.Grupo)
+                .Include(c => c.Cargo)
+                .ToList();
+
+            //List<UsuarioOperacional> usuario = _context.UsuariosOperacionais.ToList();
+            return Ok(userOperacional);
         }
         catch (Exception e)
         {
@@ -48,8 +54,13 @@ public class UsuarioController : ControllerBase
     public IActionResult ListarGerencial(){
         try
         {
-            List<UsuarioGerencial> usuario = _context.UsuariosGerenciais.ToList();
-            return Ok(usuario);
+            List<UsuarioGerencial> userGerencial = _context.UsuariosGerenciais
+                .Include(g => g.Grupo)
+                .Include(c => c.Cargo)
+                .ToList();
+
+            //List<UsuarioGerencial> usuario = _context.UsuariosGerenciais.ToList();
+            return Ok(userGerencial);
         }
         catch (Exception e)
         {
@@ -235,6 +246,7 @@ public class UsuarioController : ControllerBase
                 usuarioCadastro.Login = usuario.Login;
                 usuarioCadastro.Senha = usuario.Senha;
                 usuarioCadastro.DataNascimento = usuario.DataNascimento;
+                _context.UsuariosOperacionais.Update(usuarioCadastro);
                 _context.SaveChanges();
                 return Ok();
             }
@@ -263,6 +275,7 @@ public class UsuarioController : ControllerBase
                 usuarioCadastro.Login = usuario.Login;
                 usuarioCadastro.Senha = usuario.Senha;
                 usuarioCadastro.DataNascimento = usuario.DataNascimento;
+                _context.UsuariosGerenciais.Update(usuarioCadastro);
                 _context.SaveChanges();
                 return Ok();
             }
@@ -291,6 +304,7 @@ public class UsuarioController : ControllerBase
                 usuarioCadastro.Login = usuario.Login;
                 usuarioCadastro.Senha = usuario.Senha;
                 usuarioCadastro.DataNascimento = usuario.DataNascimento;
+                _context.UsuariosAdmin.Update(usuarioCadastro);
                 _context.SaveChanges();
                 return Ok();
             }
@@ -302,11 +316,76 @@ public class UsuarioController : ControllerBase
         }
     }
 
+     //PUT - alterar cargo - para o próprio usuário, apenas ele; Para admin, todos
+    //Operacional
+    [HttpPut]
+    [Route("operacional/alterar-cargo/{idUsuario}/{idCargo}")]
+    public async Task<IActionResult> AlterarCargoOperacionalAsync([FromRoute] int idUsuario, [FromRoute] int idCargo)
+    {
+        try
+        {
+            //Expressões lambda
+            Cargo? cargo = await _context.Cargos.FirstOrDefaultAsync(x => x.CargoId == idCargo);
+
+            UsuarioOperacional? usuarioCadastro = await _context.UsuariosOperacionais
+                .Include(c => c.Cargo)
+                .FirstOrDefaultAsync(x => x.UsuarioId == idUsuario);  
+
+            if (usuarioCadastro == null){
+                return NotFound("Usuário não encontrado");
+            }
+            if(cargo == null){
+                return NotFound("Cargo Inexistente/Não Encontrado");
+            }
+            
+            usuarioCadastro.Cargo = cargo;
+            _context.UsuariosOperacionais.Update(usuarioCadastro);
+            _ = _context.SaveChangesAsync();
+            return Ok();
+  
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    //Gerencial
+    [HttpPut]
+    [Route("gerencial/alterar-cargo/{idUsuario}/{idCargo}")]
+    public async Task<IActionResult> AlterarCargoGerencial([FromRoute] int idUsuario, [FromRoute] int idCargo)
+    {
+        try
+        {
+            //Expressões lambda
+            Cargo? cargo = await _context.Cargos.FirstOrDefaultAsync(x => x.CargoId == idCargo);
+
+            UsuarioGerencial? usuarioCadastro = await _context.UsuariosGerenciais
+                .Include(c => c.Cargo)
+                .FirstOrDefaultAsync(x => x.UsuarioId == idUsuario);  
+
+            if (usuarioCadastro == null){
+                return NotFound("Usuário não encontrado");
+            }
+            if(cargo == null){
+                return NotFound("Cargo Inexistente/Não Encontrado");
+            }
+            
+            usuarioCadastro.Cargo = cargo;
+            _context.UsuariosGerenciais.Update(usuarioCadastro);
+            _ = _context.SaveChangesAsync();
+            return Ok();
+            
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 
     //Metodo Listar Tarefa de usuario Operacional, chamando pelo ID do Usuario
     [HttpGet]
     [Route("operacional/listar-tarefa/{id}")]
-    public IActionResult ListarTarefasDoUsuarioOperacional([FromRoute]int id, [FromBody] UsuarioOperacional usuario)
+    public IActionResult ListarTarefasDoUsuarioOperacional([FromRoute]int id)
     {
         try
         {
@@ -319,7 +398,7 @@ public class UsuarioController : ControllerBase
             }
 
             // Em seguida, recupere as tarefas do usuário
-            var tarefasDoUsuario = usuario.Tarefa;
+            var tarefasDoUsuario = usuarioCadastro.Tarefa;
 
             return Ok(tarefasDoUsuario);
         }
@@ -331,7 +410,7 @@ public class UsuarioController : ControllerBase
     //Metodo Listar Tarefa de usuario Gerencial, chamando pelo ID do Usuario
     [HttpGet]
     [Route("gerencial/listar-tarefa/{id}")]
-    public IActionResult ListarTarefasDoUsuarioGerencial([FromRoute]int id, [FromBody] UsuarioGerencial usuario)
+    public IActionResult ListarTarefasDoUsuarioGerencial([FromRoute]int id)
     {
         try
         {
@@ -344,7 +423,7 @@ public class UsuarioController : ControllerBase
             }
 
             // Em seguida, recupere as tarefas do usuário
-            var tarefasDoUsuario = usuario.Tarefa;
+            var tarefasDoUsuario = usuarioCadastro.Tarefa;
 
             return Ok(tarefasDoUsuario);
         }
